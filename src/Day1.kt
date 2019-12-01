@@ -1,9 +1,9 @@
-import extension.answer
+import util.Day
 
 fun main(args: Array<String>) {
-    with(Data(day = 1)) {
-        answer(1) { floats.map { calculateFuel(it) }.sum() }
-        answer(2) { floats.map { calculateFuelRecursive(it) }.sum() }
+    Day(n = 1) {
+        answer { floats.map { calculateFuel(it) }.sum() }
+        answer { floats.map { calculateFuelRecursive(it) }.sum() }
     }
 }
 
