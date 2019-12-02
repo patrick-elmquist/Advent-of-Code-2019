@@ -23,6 +23,7 @@ class Day(private val input: Input, block: Day.() -> Unit) {
 }
 
 class Input(val lines: List<String>) {
+    val line = lines[0]
     val floats by lazy { lines.map { it.toFloat() } }
     constructor(file: File) : this(file.readLines())
 }

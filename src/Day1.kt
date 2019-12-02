@@ -1,5 +1,8 @@
 import util.Day
 
+// Answer #1: 3334282
+// Answer #2: 4998585
+
 fun main(args: Array<String>) {
     Day(n = 1) {
         answer { floats.map { calculateFuel(it) }.sum() }
