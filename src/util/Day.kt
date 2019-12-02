@@ -9,21 +9,19 @@ class Day(private val input: Input, block: Day.() -> Unit) {
     constructor(n: Int, block: Day.() -> Unit) :
             this(Input(File("./assets/input-day-$n.txt")), block)
 
-    constructor(input: List<String>, block: Day.() -> Unit) :
-            this(Input(input), block)
-
-    constructor(vararg input: String, block: Day.() -> Unit) :
-            this(Input(input.asList()), block)
-
     init {
         block(this)
     }
 
-    fun answer(block: Input.() -> Any) = println("Answer #${answerCount}: ${ block(input) }")
+    fun answer(block: Input.() -> Any) = answer(input, block)
+    fun answer(vararg input: String, block: Input.() -> Any) = answer(Input(*input), block)
+
+    private fun answer(input: Input, block: Input.() -> Any) = println("Answer #${answerCount}: ${ block(input) }")
 }
 
 class Input(val lines: List<String>) {
-    val line = lines[0]
-    val floats by lazy { lines.map { it.toFloat() } }
+    val floats by lazy { lines.asFloats() }
+
     constructor(file: File) : this(file.readLines())
+    constructor(vararg input: String) : this(input.asList())
 }

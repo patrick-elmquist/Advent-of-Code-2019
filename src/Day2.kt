@@ -1,4 +1,5 @@
 import util.Day
+import util.Input
 import util.asInts
 import util.csv
 
@@ -8,12 +9,12 @@ import util.csv
 fun main(args: Array<String>) {
     Day(n = 2) {
         answer {
-            val program = line.csv.asInts().toMutableList()
+            val program = lines.first().csv.asInts().toMutableList()
             run(program, 12, 2)
         }
 
         answer {
-            val program = line.csv.asInts()
+            val program = lines.first().csv.asInts()
             var result = -1 to -1
             outer@ for (noun in 0..99) {
                 for (verb in 0..99) {
