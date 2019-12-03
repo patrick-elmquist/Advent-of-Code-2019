@@ -1,4 +1,7 @@
-# Advent-of-Code-2019
-Solutions for Advent of Code 2019 https://adventofcode.com/
+# Advent of Code 2019
 
-Working solutions for: Day#1 - Day#1
+My solutions for Advent of Code 2019 written in Kotlin
+> https://adventofcode.com/2019
+
+
+Completed: Day#1-3
