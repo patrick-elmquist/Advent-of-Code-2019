@@ -30,33 +30,23 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun createWirePath(origin: Point, input: List<String>): List<Point> {
-    val points = mutableListOf<Point>()
-    var start = origin
-    input.forEach { instruction ->
-        val value = instruction.drop(1).toInt()
+private fun createWirePath(origin: Point, input: List<String>) =
+    input.fold(mutableListOf<Point>(origin)) { points, instruction ->
+        val start = points.last()
         val end = when(instruction.first()) {
-            'L' -> Point(start.x - value, start.y)
-            'U' -> Point(start.x, start.y + value)
-            'R' -> Point(start.x + value, start.y)
-            'D' -> Point(start.x, start.y - value)
+            'L' -> start.copy(x = start.x - instruction.drop(1).toInt())
+            'U' -> start.copy(y = start.y + instruction.drop(1).toInt())
+            'R' -> start.copy(x = start.x + instruction.drop(1).toInt())
+            'D' -> start.copy(y = start.y - instruction.drop(1).toInt())
             else -> TODO("Sink ship")
         }
-
-        var last = points.lastOrNull()
-        for (x in if (start.x < end.x) start.x..end.x else start.x downTo end.x) {
-            for (y in if (start.y < end.y) start.y..end.y else start.y downTo end.y) {
-                val point = Point(x, y)
-                if (point == last) {
-                    last = null
-                } else {
-                    points.add(point)
+        points.apply {
+            for (x in if (start.x < end.x) start.x..end.x else start.x downTo end.x) {
+                for (y in if (start.y < end.y) start.y..end.y else start.y downTo end.y) {
+                    Point(x, y).takeIf { it != start }?.let { add(it) }
                 }
             }
         }
-        start = end
     }
-    return points
-}
 
 data class Point(val x: Int = 0, val y: Int = 0)

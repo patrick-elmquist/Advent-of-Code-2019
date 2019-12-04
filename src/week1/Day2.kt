@@ -16,16 +16,11 @@ fun main(args: Array<String>) {
 
         answer {
             val program = lines.first().csv.asInts()
-            var result = -1 to -1
-            outerLoop@ for (noun in 0..99) {
+            for (noun in 0..99) {
                 for (verb in 0..99) {
-                    if (run(program, noun, verb) == 19690720) {
-                        result = noun to verb
-                        break@outerLoop
-                    }
+                    if (run(program, noun, verb) == 19690720) return@answer 100 * noun + verb
                 }
             }
-            100 * result.first + result.second
         }
     }
 }

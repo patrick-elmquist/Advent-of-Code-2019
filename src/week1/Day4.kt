@@ -21,10 +21,8 @@ fun main(args: Array<String>) {
 private fun checkRules(password: Int, allowLargerGroups: Boolean = true): Boolean {
     val (_, groups) = password.toString().toByteArray()
         .fold(Pair(Byte.MIN_VALUE, mutableMapOf<Byte, Int>())) { (previous, groups), byte ->
-            when {
-                byte < previous -> return false
-                byte == previous -> groups[byte] = (groups[byte] ?: 1) + 1
-            }
+            if (byte < previous) return false
+            if (byte == previous) groups[byte] = (groups[byte] ?: 1) + 1
             Pair(byte, groups)
         }
     return groups.isNotEmpty() && allowLargerGroups || groups.values.any { it == 2 }
