@@ -1,3 +1,5 @@
+package week1
+
 import util.Day
 
 // Answer #1: 3334282

@@ -1,25 +1,27 @@
+package week1
+
 import util.Day
 import util.csv
 import kotlin.math.abs
 
-// Answer #1: (Point(x=-325, y=-384), 709)
-// Answer #2: (Point(x=-161, y=-1208), 13836)
+// Answer #1: (week1.Point(x=-325, y=-384), 709)
+// Answer #2: (week1.Point(x=-161, y=-1208), 13836)
 
 private val origin = Point(0, 0)
 
 fun main(args: Array<String>) {
     Day(n = 3) {
         answer {
-            val firstWire = createPath(origin, lines[0].csv)
-            val secondWire = createPath(origin, lines[1].csv)
+            val firstWire = createWirePath(origin, lines[0].csv)
+            val secondWire = createWirePath(origin, lines[1].csv)
             firstWire.intersect(secondWire)
                 .filter { it != origin }
                 .map { it to (abs(it.x) + abs(it.y)) }
                 .minBy { it.second }
         }
         answer {
-            val firstWire = createPath(origin, lines[0].csv)
-            val secondWire = createPath(origin, lines[1].csv)
+            val firstWire = createWirePath(origin, lines[0].csv)
+            val secondWire = createWirePath(origin, lines[1].csv)
             firstWire.intersect(secondWire)
                 .filter { it != origin }
                 .map { it to (firstWire.indexOf(it) + secondWire.indexOf(it)) }
@@ -28,7 +30,7 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun createPath(origin: Point, input: List<String>): List<Point> {
+private fun createWirePath(origin: Point, input: List<String>): List<Point> {
     val points = mutableListOf<Point>()
     var start = origin
     input.forEach { instruction ->

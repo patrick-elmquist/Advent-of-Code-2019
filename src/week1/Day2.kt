@@ -1,5 +1,6 @@
+package week1
+
 import util.Day
-import util.Input
 import util.asInts
 import util.csv
 
@@ -9,18 +10,18 @@ import util.csv
 fun main(args: Array<String>) {
     Day(n = 2) {
         answer {
-            val program = lines.first().csv.asInts().toMutableList()
+            val program = lines.first().csv.asInts()
             run(program, 12, 2)
         }
 
         answer {
             val program = lines.first().csv.asInts()
             var result = -1 to -1
-            outer@ for (noun in 0..99) {
+            outerLoop@ for (noun in 0..99) {
                 for (verb in 0..99) {
-                    if (run(program.toMutableList(), noun, verb) == 19690720) {
+                    if (run(program, noun, verb) == 19690720) {
                         result = noun to verb
-                        break@outer
+                        break@outerLoop
                     }
                 }
             }
@@ -29,7 +30,8 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun run(program: MutableList<Int>, noun: Int, verb: Int): Int {
+private fun run(program: List<Int>, noun: Int, verb: Int): Int {
+    val program = program.toMutableList()
     program[1] = noun
     program[2] = verb
 
