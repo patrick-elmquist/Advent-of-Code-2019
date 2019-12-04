@@ -19,18 +19,13 @@ fun main(args: Array<String>) {
 }
 
 private fun checkRules(password: Int, allowLargerGroups: Boolean = true): Boolean {
-    val groups = mutableMapOf<Int, Int>()
-    var previousDigit = Int.MAX_VALUE
-    var remainingPassword = password
-
-    while (remainingPassword > 0) {
-        val digit = remainingPassword % 10
-        when {
-            digit > previousDigit -> return false
-            digit == previousDigit -> groups[digit] = (groups[digit] ?: 1) + 1
+    val (_, groups) = password.toString().toByteArray()
+        .fold(Pair(Byte.MIN_VALUE, mutableMapOf<Byte, Int>())) { (previous, groups), byte ->
+            when {
+                byte < previous -> return false
+                byte == previous -> groups[byte] = (groups[byte] ?: 1) + 1
+            }
+            Pair(byte, groups)
         }
-        previousDigit = digit
-        remainingPassword /= 10
-    }
     return groups.isNotEmpty() && allowLargerGroups || groups.values.any { it == 2 }
 }
