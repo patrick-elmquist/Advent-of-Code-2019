@@ -7,7 +7,7 @@ import util.csv
 // Answer #1: 11590668
 // Answer #2: 2254
 
-fun main(args: Array<String>) {
+fun main() {
     Day(n = 2) {
         answer {
             val program = lines.first().csv.asInts()

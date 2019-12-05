@@ -5,7 +5,7 @@ import util.Day
 // Answer #1: 475
 // Answer #2: 297
 
-fun main(args: Array<String>) {
+fun main() {
     Day(n = 4) {
         answer {
             val input = lines.first().split("-")

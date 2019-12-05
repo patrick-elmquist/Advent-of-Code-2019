@@ -9,7 +9,7 @@ import kotlin.math.abs
 
 private val origin = Point(0, 0)
 
-fun main(args: Array<String>) {
+fun main() {
     Day(n = 3) {
         answer {
             val firstWire = createWirePath(origin, lines[0].csv)
