@@ -8,7 +8,6 @@ import kotlin.math.pow
 // Answer #1: 14155342
 // Answer #2: 8684145
 
-
 fun main() {
     Day(n = 5) {
         answer { Program(lines.first().csv.asInts().toMutableList()).run(input = 1) }
