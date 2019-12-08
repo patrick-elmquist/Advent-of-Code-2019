@@ -5,6 +5,7 @@ import java.lang.IllegalArgumentException
 fun <T: Collection<String>> T.asInts() = this.map { it.toInt() }
 fun <T: Collection<String>> T.asFloats() = this.map { it.toFloat() }
 
+fun IntRange.permutations() = toList().permutations()
 fun <T> List<T>.permutations(): Set<List<T>> = when {
     isEmpty() -> emptySet()
     size == 1 -> setOf(listOf(get(0)))

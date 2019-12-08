@@ -10,8 +10,8 @@ import util.csv
 
 fun main() {
     Day(n = 5) {
-        answer { IntCode(lines.first().csv.asInts(), input = listOf(1)).run() }
-        answer { IntCode(lines.first().csv.asInts(), input = listOf(5)).run() }
+        answer { IntCode(lines.first().csv.asInts()).run(input = listOf(1)) }
+        answer { IntCode(lines.first().csv.asInts()).run(input = listOf(5)) }
     }
 }
 
