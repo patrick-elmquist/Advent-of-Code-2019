@@ -1,5 +1,3 @@
-package week1
-
 import util.Day
 import util.IntCode
 import util.asInts

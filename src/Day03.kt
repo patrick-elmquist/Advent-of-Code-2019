@@ -1,11 +1,9 @@
-package week1
-
 import util.Day
 import util.csv
 import kotlin.math.abs
 
-// Answer #1: (week1.Point(x=-325, y=-384), 709)
-// Answer #2: (week1.Point(x=-161, y=-1208), 13836)
+// Answer #1: (Point(x=-325, y=-384), 709)
+// Answer #2: (Point(x=-161, y=-1208), 13836)
 
 private val origin = Point(0, 0)
 
