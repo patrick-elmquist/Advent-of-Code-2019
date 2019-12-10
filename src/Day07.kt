@@ -1,8 +1,8 @@
 import util.Day
 import util.IntCode
-import util.asLongs
-import util.csv
-import util.permutations
+import extension.asLongs
+import extension.csv
+import extension.permutations
 
 // Answer #1: 118936
 // Answer #2: 57660948

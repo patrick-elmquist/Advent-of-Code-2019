@@ -1,5 +1,6 @@
 package util
 
+import extension.asFloats
 import java.io.File
 
 class Day(private val input: Input, block: Day.() -> Unit) {

@@ -1,6 +1,6 @@
 import util.Day
-import util.asInts
-import util.csv
+import extension.asInts
+import extension.csv
 
 // Answer #1: 11590668
 // Answer #2: 2254

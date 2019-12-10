@@ -1,10 +1,12 @@
-package util
+package extension
 
 import java.lang.IllegalArgumentException
 
-fun <T: Collection<String>> T.asInts() = this.map { it.toInt() }
-fun <T: Collection<String>> T.asLongs() = this.map { it.toLong() }
-fun <T: Collection<String>> T.asFloats() = this.map { it.toFloat() }
+fun <T: Collection<String>> T.asInts() = map { it.toInt() }
+fun <T: Collection<String>> T.asLongs() = map { it.toLong() }
+fun <T: Collection<String>> T.asFloats() = map { it.toFloat() }
+
+fun <E,T : Collection<E>> T.print(): T = onEach { println(it) }
 
 fun IntRange.permutations() = toList().permutations()
 fun <T> List<T>.permutations(): Set<List<T>> = when {

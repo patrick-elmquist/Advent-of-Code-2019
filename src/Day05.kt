@@ -1,8 +1,7 @@
 import util.Day
 import util.IntCode
-import util.asInts
-import util.asLongs
-import util.csv
+import extension.asLongs
+import extension.csv
 
 // Answer #1: 14155342
 // Answer #2: 8684145

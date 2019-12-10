@@ -1,108 +1,68 @@
 import util.Day
+import extension.f
+import kotlin.math.PI
 import kotlin.math.atan2
+import kotlin.math.pow
+import kotlin.math.sqrt
 
-// Answer #1:
-// Answer #2:
+// Answer #1: (Asteroid(x=26.0, y=29.0), 303)
+// Answer #2: (Asteroid(x=4.0, y=8.0), 408.0)
 
 fun main() {
-    val test1 = (".#..#\n" +
-            ".....\n" +
-            "#####\n" +
-            "....#\n" +
-            "...##").split("\n")
-    val test2 = ("......#.#.\n" +
-            "#..#.#....\n" +
-            "..#######.\n" +
-            ".#.#.###..\n" +
-            ".#..#.....\n" +
-            "..#....#.#\n" +
-            "#..#....#.\n" +
-            ".##.#..###\n" +
-            "##...#..#.\n" +
-            ".#....####").split("\n")
-
-    val test3 = ("#.#...#.#.\n" +
-            ".###....#.\n" +
-            ".#....#...\n" +
-            "##.#.#.#.#\n" +
-            "....#.#.#.\n" +
-            ".##..###.#\n" +
-            "..#...##..\n" +
-            "..##....##\n" +
-            "......#...\n" +
-            ".####.###.").split("\n")
-
-    val test4 = (".#..#..###\n" +
-            "####.###.#\n" +
-            "....###.#.\n" +
-            "..###.##.#\n" +
-            "##.##.#.#.\n" +
-            "....###..#\n" +
-            "..#.#..#.#\n" +
-            "#..#.#.###\n" +
-            ".##...##.#\n" +
-            ".....#.#..").split("\n")
-
-    val test5 = (".#..##.###...#######\n" +
-            "##.############..##.\n" +
-            ".#.######.########.#\n" +
-            ".###.#######.####.#.\n" +
-            "#####.##.#.##.###.##\n" +
-            "..#####..#.#########\n" +
-            "####################\n" +
-            "#.####....###.#.#.##\n" +
-            "##.#################\n" +
-            "#####.##.###..####..\n" +
-            "..######..##.#######\n" +
-            "####.##.####...##..#\n" +
-            ".#####..#.######.###\n" +
-            "##...#.##########...\n" +
-            "#.##########.#######\n" +
-            ".####.#.###.###.#.##\n" +
-            "....##.##.###..#####\n" +
-            ".#.#.###########.###\n" +
-            "#.#.#.#####.####.###\n" +
-            "###.##.####.##.#..##").split("\n")
-
     Day(n = 10) {
-        answer {
-            println(part1(test1))
-            check(part1(test1)?.first == Asteroid(3f, 4f), { "Test 1 failed" })
-            check(part1(test2)?.first == Asteroid(5f, 8f), { "Test 2 failed" })
-            check(part1(test3)?.first == Asteroid(1f, 2f), { "Test 3 failed" })
-            check(part1(test4)?.first == Asteroid(6f, 3f), { "Test 4 failed" })
-            check(part1(test5)?.first == Asteroid(11f, 13f), { "Test 5 failed" })
-            part1(lines)
-        }
-        answer {
-
-        }
+        answer { findOptimalAsteroidForStation(parseAsteroids(lines)) }
+        answer { part2(parseAsteroids(lines)) }
     }
-}
-
-private fun part1(input: List<String>): Pair<Asteroid, Int>? {
-    val asteroids = input.mapIndexedNotNull { y, row ->
-        row.mapIndexedNotNull { x, column ->
-            if (column == '#') {
-                Asteroid(x.toFloat(), y.toFloat())
-            } else {
-                null
-            }
-        }
-    }.flatten()
-
-    val asteroidsMap = asteroids.map { outer ->
-        outer to asteroids.map { inner ->
-            inner to atan2(outer.y - inner.y, outer.x - inner.x)
-        }.filter { it.first != outer }
-    }
-
-    val asteroidCount = asteroidsMap.map {
-        it.first to it.second.fold(mutableSetOf<Float>()) { set, input ->
-            set.apply { add(input.second) }
-        }.count()
-    }
-    return asteroidCount.maxBy { it.second }
 }
 
 data class Asteroid(val x: Float, val y: Float)
+
+private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
+    asteroids
+        .map { origin ->
+            origin to asteroids.asSequence()
+                .filter { it != origin }
+                .map { angleBetween(origin, it) }
+                .distinct()
+                .count()
+        }
+        .maxBy { (_, count) -> count }
+
+private fun part2(asteroids: List<Asteroid>): Pair<Asteroid, Float>? {
+    val station = findOptimalAsteroidForStation(asteroids)?.first ?: throw IllegalStateException()
+    val stuff = asteroids.asSequence()
+        .filter { it != station }
+        .map { it to angleBetween(station, it) }
+        .groupBy { it.second }
+        .map { (angle, asteroids) ->
+            angle to asteroids
+                .map { it.first }
+                .sortedBy { distanceBetween(station, it) }
+        }
+        .sortedBy { (angle, _) -> angle }
+        .toMutableList()
+
+    var index = 0
+    var n = 1
+    while(true) {
+        val pair = stuff[index]
+        if (pair.second.isNotEmpty()) {
+            if (n == 200) {
+                return stuff[index].second.first() to stuff[index].second.first().let { it.x * 100f + it.y }
+            }
+            stuff[index] = pair.copy(second = pair.second.drop(1))
+            n++
+        }
+        index = (index + 1) % stuff.size
+    }
+}
+
+private fun parseAsteroids(input: List<String>) =
+    input.mapIndexed { y, row -> row.mapIndexedNotNull { x, c -> if (c == '#') Asteroid(x.f, y.f) else null } }
+        .flatten()
+
+private fun angleBetween(origin: Asteroid, asteroid: Asteroid) =
+    (atan2(origin.y - asteroid.y, origin.x - asteroid.x) * 180f / PI.f + 270) % 360
+
+private fun distanceBetween(origin: Asteroid, asteroid: Asteroid) =
+    sqrt((origin.x - asteroid.x).pow(2) + (origin.y - asteroid.y).pow(2))
