@@ -14,6 +14,7 @@ class Day(private val input: Input, block: Day.() -> Unit) {
 
     fun answer(block: Input.() -> Any?) = answer(input, block)
     fun answer(vararg input: String, block: Input.() -> Any?) = answer(Input(*input), block)
+    fun answer(input: List<String>, block: Input.() -> Any?) = answer(Input(input), block)
 
     private fun answer(input: Input, block: Input.() -> Any?) = println("Answer #${answerCount}: ${ block(input) }")
 }
