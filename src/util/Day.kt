@@ -6,8 +6,7 @@ class Day(private val input: Input, block: Day.() -> Unit) {
     private var answerCount: Int = 1
         get() = field.also { field++ }
 
-    constructor(n: Int, block: Day.() -> Unit) :
-            this(Input(File("./assets/input-day-$n.txt")), block)
+    constructor(n: Int, block: Day.() -> Unit) : this(Input(n), block)
 
     init {
         block(this)
@@ -22,6 +21,7 @@ class Day(private val input: Input, block: Day.() -> Unit) {
 class Input(val lines: List<String>) {
     val floats by lazy { lines.asFloats() }
 
+    constructor(day: Int) : this(File("./assets/input-day-$day.txt"))
     constructor(file: File) : this(file.readLines())
     constructor(vararg input: String) : this(input.asList())
 }

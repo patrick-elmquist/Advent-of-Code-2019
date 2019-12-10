@@ -1,6 +1,7 @@
 import util.Day
 import util.IntCode
 import util.asInts
+import util.asLongs
 import util.csv
 
 // Answer #1: 14155342
@@ -8,8 +9,8 @@ import util.csv
 
 fun main() {
     Day(n = 5) {
-        answer { IntCode(lines.first().csv.asInts()).run(input = listOf(1)) }
-        answer { IntCode(lines.first().csv.asInts()).run(input = listOf(5)) }
+        answer { IntCode(lines.first().csv.asLongs()).run(1) }
+        answer { IntCode(lines.first().csv.asLongs()).run(5) }
     }
 }
 

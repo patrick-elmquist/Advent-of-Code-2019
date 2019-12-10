@@ -3,6 +3,7 @@ package util
 import java.lang.IllegalArgumentException
 
 fun <T: Collection<String>> T.asInts() = this.map { it.toInt() }
+fun <T: Collection<String>> T.asLongs() = this.map { it.toLong() }
 fun <T: Collection<String>> T.asFloats() = this.map { it.toFloat() }
 
 fun IntRange.permutations() = toList().permutations()
