@@ -10,59 +10,57 @@ import kotlin.math.sqrt
 
 fun main() {
     Day(n = 10) {
-        answer { findOptimalAsteroidForStation(parseAsteroids(lines)) }
-        answer { part2(parseAsteroids(lines)) }
+        answer { findOptimalAsteroidForStation(Asteroid.parseList(lines)) }
+        answer { vaporizeAsteroids(Asteroid.parseList(lines)) }
     }
 }
-
-data class Asteroid(val x: Float, val y: Float)
 
 private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
     asteroids
         .map { origin ->
             origin to asteroids.asSequence()
                 .filter { it != origin }
-                .map { angleBetween(origin, it) }
+                .map { origin.angleTo(it) }
                 .distinct()
                 .count()
         }
         .maxBy { (_, count) -> count }
 
-private fun part2(asteroids: List<Asteroid>): Pair<Asteroid, Float>? {
-    val station = findOptimalAsteroidForStation(asteroids)?.first ?: throw IllegalStateException()
-    val stuff = asteroids.asSequence()
+private fun vaporizeAsteroids(asteroids: List<Asteroid>): Pair<Asteroid, Float>? {
+    val station = findOptimalAsteroidForStation(asteroids)?.first ?: throw IllegalStateException("Sink ship")
+    val asteroidsForAngle = asteroids.asSequence()
         .filter { it != station }
-        .map { it to angleBetween(station, it) }
-        .groupBy { it.second }
+        .map { it to station.angleTo(it) }
+        .groupBy { (_, angle) -> angle }
         .map { (angle, asteroids) ->
             angle to asteroids
                 .map { it.first }
-                .sortedBy { distanceBetween(station, it) }
+                .sortedBy { station.distanceTo(it) }
         }
         .sortedBy { (angle, _) -> angle }
+        .map { (_, asteroids) -> asteroids }
         .toMutableList()
 
     var index = 0
-    var n = 1
+    var vaporized = 0
     while(true) {
-        val pair = stuff[index]
-        if (pair.second.isNotEmpty()) {
-            if (n == 200) {
-                return stuff[index].second.first() to stuff[index].second.first().let { it.x * 100f + it.y }
-            }
-            stuff[index] = pair.copy(second = pair.second.drop(1))
-            n++
+        val pair = asteroidsForAngle[index]
+        if (pair.isNotEmpty()) {
+            vaporized++
+            if (vaporized == 200) break else asteroidsForAngle[index] = pair.drop(1)
         }
-        index = (index + 1) % stuff.size
+        index = (index + 1) % asteroidsForAngle.size
     }
+    return asteroidsForAngle[index].first() to asteroidsForAngle[index].first().let { it.x * 100f + it.y }
 }
 
-private fun parseAsteroids(input: List<String>) =
-    input.mapIndexed { y, row -> row.mapIndexedNotNull { x, c -> if (c == '#') Asteroid(x.f, y.f) else null } }
-        .flatten()
+data class Asteroid(val x: Float, val y: Float) {
+    fun angleTo(asteroid: Asteroid) = (atan2(y - asteroid.y, x - asteroid.x) * 180f / PI.f + 270) % 360
+    fun distanceTo(asteroid: Asteroid) = sqrt((x - asteroid.x).pow(2) + (y - asteroid.y).pow(2))
 
-private fun angleBetween(origin: Asteroid, asteroid: Asteroid) =
-    (atan2(origin.y - asteroid.y, origin.x - asteroid.x) * 180f / PI.f + 270) % 360
-
-private fun distanceBetween(origin: Asteroid, asteroid: Asteroid) =
-    sqrt((origin.x - asteroid.x).pow(2) + (origin.y - asteroid.y).pow(2))
+    companion object {
+        fun parseList(input: List<String>) = input
+            .mapIndexed { y, row -> row.mapIndexedNotNull { x, c -> if (c == '#') Asteroid(x.f, y.f) else null } }
+            .flatten()
+    }
+}
