@@ -18,8 +18,8 @@ fun main() {
 private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
     asteroids
         .map { origin ->
-            origin to asteroids.asSequence()
-                .filter { it != origin }
+            origin to asteroids
+                .filterNot { it == origin }
                 .map { origin.angleTo(it) }
                 .distinct()
                 .count()
@@ -27,31 +27,25 @@ private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
         .maxBy { (_, count) -> count }
 
 private fun vaporizeAsteroids(asteroids: List<Asteroid>): Pair<Asteroid, Float>? {
-    val station = findOptimalAsteroidForStation(asteroids)?.first ?: throw IllegalStateException("Sink ship")
+    val station = findOptimalAsteroidForStation(asteroids)?.first
+        ?: throw IllegalStateException("Sink ship")
+
     val asteroidsForAngle = asteroids.asSequence()
-        .filter { it != station }
-        .map { it to station.angleTo(it) }
-        .groupBy { (_, angle) -> angle }
-        .map { (angle, asteroids) ->
-            angle to asteroids
-                .map { it.first }
-                .sortedBy { station.distanceTo(it) }
-        }
-        .sortedBy { (angle, _) -> angle }
-        .map { (_, asteroids) -> asteroids }
-        .toMutableList()
+        .filter { target -> target != station }
+        .groupBy { target -> station.angleTo(target)}
+        .map { it.key to it.value.sortedBy { target -> target.distanceTo(station) }.toMutableList() }
+        .sortedBy { it.first }
 
     var index = 0
     var vaporized = 0
     while(true) {
-        val pair = asteroidsForAngle[index]
-        if (pair.isNotEmpty()) {
-            vaporized++
-            if (vaporized == 200) break else asteroidsForAngle[index] = pair.drop(1)
+        val list = asteroidsForAngle[index].second
+        if (list.isNotEmpty()) {
+            if (++vaporized == 200) break else list.removeAt(0)
         }
-        index = (index + 1) % asteroidsForAngle.size
+        index = ++index % asteroidsForAngle.size
     }
-    return asteroidsForAngle[index].first() to asteroidsForAngle[index].first().let { it.x * 100f + it.y }
+    return asteroidsForAngle[index].second.first().let { it to (it.x * 100f + it.y) }
 }
 
 data class Asteroid(val x: Float, val y: Float) {
