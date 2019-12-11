@@ -22,6 +22,7 @@ class IntCode(instructions: List<Long>, private val debug: Boolean = false) {
     fun run(vararg input: Long): Long {
         log("run: ${input.toList()}")
         var inputIndex = 0
+        outputs.clear()
         while (true) {
             pointer = when (Op.from(memory[pointer] % 100L)) {
                 Op.ADD -> (pointer + 4).also { store(3, paramValue(1) + paramValue(2)) }
