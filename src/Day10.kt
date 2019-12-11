@@ -1,21 +1,19 @@
 import util.Day
-import extension.f
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.pow
-import kotlin.math.sqrt
+import util.Point
+import util.angleTo
+import util.distanceTo
 
 // Answer #1: (Asteroid(x=26.0, y=29.0), 303)
 // Answer #2: (Asteroid(x=4.0, y=8.0), 408.0)
 
 fun main() {
     Day(n = 10) {
-        answer { findOptimalAsteroidForStation(Asteroid.parseList(lines)) }
-        answer { vaporizeAsteroids(Asteroid.parseList(lines)) }
+        answer { findOptimalAsteroidForStation(parseList(lines)) }
+        answer { vaporizeAsteroids(parseList(lines)) }
     }
 }
 
-private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
+private fun findOptimalAsteroidForStation(asteroids: List<Point>) =
     asteroids
         .map { origin ->
             origin to asteroids
@@ -26,13 +24,13 @@ private fun findOptimalAsteroidForStation(asteroids: List<Asteroid>) =
         }
         .maxBy { (_, count) -> count }
 
-private fun vaporizeAsteroids(asteroids: List<Asteroid>): Pair<Asteroid, Float>? {
+private fun vaporizeAsteroids(asteroids: List<Point>): Pair<Point, Float>? {
     val station = findOptimalAsteroidForStation(asteroids)?.first
         ?: throw IllegalStateException("Sink ship")
 
     val asteroidsForAngle = asteroids.asSequence()
         .filter { target -> target != station }
-        .groupBy { target -> station.angleTo(target)}
+        .groupBy { target -> (station.angleTo(target) + 270) % 360 }
         .map { it.key to it.value.sortedBy { target -> target.distanceTo(station) }.toMutableList() }
         .sortedBy { it.first }
 
@@ -48,13 +46,6 @@ private fun vaporizeAsteroids(asteroids: List<Asteroid>): Pair<Asteroid, Float>?
     return asteroidsForAngle[index].second.first().let { it to (it.x * 100f + it.y) }
 }
 
-data class Asteroid(val x: Float, val y: Float) {
-    fun angleTo(asteroid: Asteroid) = (atan2(y - asteroid.y, x - asteroid.x) * 180f / PI.f + 270) % 360
-    fun distanceTo(asteroid: Asteroid) = sqrt((x - asteroid.x).pow(2) + (y - asteroid.y).pow(2))
-
-    companion object {
-        fun parseList(input: List<String>) = input
-            .mapIndexed { y, row -> row.mapIndexedNotNull { x, c -> if (c == '#') Asteroid(x.f, y.f) else null } }
-            .flatten()
-    }
-}
+private fun parseList(input: List<String>) = input
+    .mapIndexed { y, row -> row.mapIndexedNotNull { x, c -> if (c == '#') Point(x, y) else null } }
+    .flatten()

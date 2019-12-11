@@ -1,5 +1,6 @@
 import util.Day
 import extension.csv
+import util.Point
 import kotlin.math.abs
 
 // Answer #1: (Point(x=-325, y=-384), 709)
@@ -46,5 +47,3 @@ private fun createWirePath(origin: Point, input: List<String>) =
             }
         }
     }
-
-data class Point(val x: Int = 0, val y: Int = 0)
