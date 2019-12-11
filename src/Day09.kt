@@ -8,8 +8,6 @@ import extension.csv
 
 fun main() {
     Day(n = 9) {
-        IntCode.verify()
-
         answer {
             val instructions = lines.first().csv.asLongs()
             IntCode(instructions).run(1).also { check(it == 2316632620L) }

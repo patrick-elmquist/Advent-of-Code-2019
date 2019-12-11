@@ -6,7 +6,7 @@ import kotlin.math.pow
 import kotlin.properties.Delegates
 
 class IntCode(instructions: List<Long>, private val debug: Boolean = false) {
-    private val memory = Memory(instructions)
+    val memory = Memory(instructions)
 
     private var pointer = 0L
     private var relativeBase = 0L
@@ -72,7 +72,7 @@ class IntCode(instructions: List<Long>, private val debug: Boolean = false) {
         }
     }
 
-    private class Memory(instructions: List<Long>) {
+    class Memory(instructions: List<Long>) {
         private val memory: MutableMap<Long, Long> = instructions
             .foldIndexed(mutableMapOf()) { i, map, instr -> map.also { map[i.toLong()] = instr } }
         operator fun get(index: Long): Long = memory.getOrPut(index, { 0L })

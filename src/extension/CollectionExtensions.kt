@@ -20,9 +20,9 @@ fun <T> List<T>.permutations(): Set<List<T>> = when {
     }
 }
 
-internal fun <T> List<T>.plusAt(index: Int, element: T): List<T> = when {
-    index !in 0..size -> throw IllegalArgumentException("Index: $index Size: $size")
-    index == 0 -> listOf(element) + this
-    index == size -> this + element
+internal fun <T> List<T>.plusAt(index: Int, element: T): List<T> = when (index) {
+    !in 0..size -> throw IllegalArgumentException("Index: $index Size: $size")
+    0 -> listOf(element) + this
+    size -> this + element
     else -> dropLast(size - index) + element + drop(index)
 }

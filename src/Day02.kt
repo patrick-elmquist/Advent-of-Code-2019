@@ -1,6 +1,7 @@
 import util.Day
-import extension.asInts
+import extension.asLongs
 import extension.csv
+import util.IntCode
 
 // Answer #1: 11590668
 // Answer #2: 2254
@@ -8,38 +9,25 @@ import extension.csv
 fun main() {
     Day(n = 2) {
         answer {
-            val program = lines.first().csv.asInts()
-            run(program, 12, 2)
+            val instructions = lines.first().csv.asLongs().toMutableList().also {
+                it[1] = 12
+                it[2] = 2
+            }
+            IntCode(instructions).apply { run() }.memory[0]
         }
 
         answer {
-            val program = lines.first().csv.asInts()
-            for (noun in 0..99) {
-                for (verb in 0..99) {
-                    if (run(program, noun, verb) == 19690720) return@answer 100 * noun + verb
+            val input = lines.first().csv.asLongs()
+            for (noun in 0L..99L) {
+                for (verb in 0L..99L) {
+                    val instructions = input.toMutableList().also {
+                        it[1] = noun
+                        it[2] = verb
+                    }
+                    val program = IntCode(instructions).apply { run() }
+                    if (program.memory[0] == 19690720L) return@answer 100L * noun + verb
                 }
             }
         }
     }
-}
-
-private fun run(program: List<Int>, noun: Int, verb: Int): Int {
-    val program = program.toMutableList()
-    program[1] = noun
-    program[2] = verb
-
-    var opIndex = 0
-    while (true) {
-        val opCode = program[opIndex]
-
-        if (opCode != 1 && opCode != 2) break
-
-        val r1 = program[program[opIndex + 1]]
-        val r2 = program[program[opIndex + 2]]
-        val r3 = program[opIndex + 3]
-        program[r3] = if (opCode == 1) r1 + r2 else r1 * r2
-
-        opIndex += 4
-    }
-    return program[0]
 }
