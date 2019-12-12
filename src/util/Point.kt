@@ -15,6 +15,10 @@ data class PointF(val x: Float = 0f, val y: Float = 0f) {
         if (round) Point(x.roundToInt(), y.roundToInt()) else Point(x.toInt(), y.toInt())
 }
 
+data class Point3d(var x: Int = 0, var y: Int = 0, var z: Int = 0) {
+    fun translateBy(dx: Int, dy: Int, dz: Int): Point3d = copy(x = x + dx, y = y + dy, z = z + dz)
+}
+
 fun Point.angleTo(target: Point) = toPointF().angleTo(target.toPointF())
 fun PointF.angleTo(target: PointF) = atan2(y - target.y, x - target.x) * 180f / PI.f
 
