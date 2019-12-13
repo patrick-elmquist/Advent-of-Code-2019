@@ -19,6 +19,9 @@ fun main() {
     }
 }
 
+private fun generate1000Steps(moons: List<Moon>) =
+    generateSequence(0 to moons) { (n, moons) -> if (n < 1000) n + 1 to step(moons) else null }
+
 private fun generateRepeatedSequence(moons: List<Moon>) =
     generateSequence(State(moons, 1)) { state ->
         val step = step(state.moons)
@@ -56,9 +59,6 @@ private fun comparePosition(origin: Int, target: Int) =
     }
 
 private fun Point3d.absSum() = abs(x) + abs(y) + abs(z)
-
-private fun generate1000Steps(moons: List<Moon>) =
-    generateSequence(0 to moons) { (n, moons) -> if (n < 1000) n + 1 to step(moons) else null }
 
 private data class State(val moons: List<Moon>, val n: Int, var x: Int? = null, var y: Int? = null, var z: Int? = null)
 
