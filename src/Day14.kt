@@ -2,36 +2,46 @@ import util.Day
 import kotlin.math.ceil
 
 // Answer #1: 220019
-// Answer #2:
-
-private data class Reaction(
-    val name: String,
-    val smallestAmount: Int,
-    val inputs: Map<String, Int>
-)
+// Answer #2: 5650230
 
 fun main() {
     Day(n = 14) {
+        answer { calculateOres(parseReactionTree(lines), mutableMapOf(), "FUEL", 1L) }
         answer {
-            calculateOres(parseReactionTree(lines), mutableMapOf(), "FUEL", 1)
-        }
+            val ore = 1000000000000L
+            val reactionTree = parseReactionTree(lines)
+            val costForOne = calculateOres(reactionTree, mutableMapOf(), "FUEL", 1L)
 
-        answer {  }
+            var fuel = ore / costForOne
+            while(true) {
+                val cost = calculateOres(reactionTree, mutableMapOf(), "FUEL", fuel)
+                if (cost >= ore) {
+                    println("breaking: fuel:$fuel cost:$cost")
+                    break
+                }
+                fuel++
+            }
+            fuel - 1
+        }
     }
 }
 
-private fun calculateOres(tree: Map<String, Reaction>, storage: MutableMap<String, Int>, name: String, wanted: Int): Int {
+private fun calculateOres(
+    tree: Map<String, Reaction>,
+    storage: MutableMap<String, Long>,
+    name: String,
+    wanted: Long
+): Long {
     val reaction = tree[name] ?: error("Could not find reaction for $name")
 
     val needToProduce = pullFromStorage(storage, name, wanted)
-    if (needToProduce == 0) return 0
+    if (needToProduce == 0L) return 0L
 
-    val repeats = ceil(needToProduce / reaction.smallestAmount.toFloat()).toInt()
+    val repeats = ceil(needToProduce.toFloat() / reaction.smallestAmount.toFloat()).toLong()
     val producedAmount = repeats * reaction.smallestAmount
 
-    storage[name] = producedAmount - needToProduce
+    storage.merge(name, producedAmount - needToProduce, Long::plus)
 
-    storage.getOrDefault(name, 0)
     return reaction.inputs.map { (name, amount) ->
         if (name == "ORE") {
             amount * repeats
@@ -41,17 +51,19 @@ private fun calculateOres(tree: Map<String, Reaction>, storage: MutableMap<Strin
     }.sum()
 }
 
-private fun pullFromStorage(storage: MutableMap<String, Int>, name: String, amount: Int): Int {
-    val spare = storage.getOrDefault(name, 0)
-    storage[name] = (spare - amount).coerceAtLeast(0)
-    return (amount - spare).coerceAtLeast(0)
+private fun pullFromStorage(storage: MutableMap<String, Long>, name: String, amount: Long): Long {
+    val spare = storage.getOrDefault(name, 0L)
+    storage[name] = (spare - amount).coerceAtLeast(0L)
+    return (amount - spare).coerceAtLeast(0L)
 }
+
+private data class Reaction(val name: String, val smallestAmount: Long, val inputs: Map<String, Long>)
 
 private fun parseReactionTree(lines: List<String>) =
     lines.map { it.split(" => ").let { it[0].split(", ") to it[1] } }
         .map { (input, output) ->
-            val (name, amount) = output.split(" ").let { it[1] to it[0].toInt() }
-            val inputs = input.map { it.split(" ").let { it[1] to it[0].toInt() } }.toMap()
+            val (name, amount) = output.split(" ").let { it[1] to it[0].toLong() }
+            val inputs = input.map { it.split(" ").let { it[1] to it[0].toLong() } }.toMap()
             Reaction(name, amount, inputs)
         }
         .associateBy { it.name }
