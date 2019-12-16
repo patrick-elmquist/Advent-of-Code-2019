@@ -2,50 +2,62 @@ import Status.*
 import extension.asLongs
 import extension.csv
 import util.Day
-import util.Direction
+import util.CardinalDirection
 import util.IntCode
 import util.Point
 
 // Answer #1: 240
-// Answer #2:
+// Answer #2: 322
 
 fun main() {
     Day(n = 15) {
         answer {
             val map = createMap(IntCode(lines.first().csv.asLongs()))
             val start = map.entries.first { it.value == 'S' }.key
-            val oxygen = map.entries.first { it.value == 'O' }.key
-            findShortestPath(map = map, from = start, to = oxygen)
+            val oxygenSystem = map.entries.first { it.value == 'O' }.key
+            findShortestPath(map = map, from = start, to = oxygenSystem)
         }
         answer {
-            "Not implemented"
+            val map = createMap(IntCode(lines.first().csv.asLongs()))
+            val oxygenSystem = map.entries.first { it.value == 'O' }.key
+            observeOxygen(map = map, source = oxygenSystem)
         }
     }
 }
 
-private fun findShortestPath(map: Map<Point, Char>, from: Point, to: Point): Int {
-    val map = map.filter { it.value != '#' }
+private fun observeOxygen(map: Map<Point, Char>, source: Point): Int {
+    val tiles = map.filter { it.value != '#' }.mapValues { -1 }.toMutableMap()
+    val queue = mutableListOf<Point>()
+    queue.add(source)
+    tiles[source] = 0
 
-    val visited = mutableMapOf<Point, Int>()
+    while(tiles.values.filter { it != -1 }.size != tiles.size || queue.isNotEmpty()) {
+        visitAndQueueNeighbours(queue.removeAt(0), tiles, queue)
+    }
+    return tiles.values.max() ?: error("")
+}
+
+private fun findShortestPath(map: Map<Point, Char>, from: Point, to: Point): Int {
+    val tiles = map.filter { it.value != '#' }.mapValues { -1 }.toMutableMap()
     val queue = mutableListOf<Point>()
     queue.add(from)
-    visited[from] = 0
+    tiles[from] = 0
 
-    while(true) {
-        val point = queue.removeAt(0)
-        val distance = visited[point] ?: error("You cocked up!")
-
-        if (point == to) return distance
-
-        point.neighbours
-            .filter { it in map }
-            .filter { it !in visited }
-            .forEach {
-                visited[it] = distance + 1
-                queue.add(it)
-            }
-
+    var point: Point? = null
+    while(point != to) {
+        point = queue.removeAt(0)
+        visitAndQueueNeighbours(point, tiles, queue)
     }
+    return tiles[point] ?: error("")
+}
+
+private fun visitAndQueueNeighbours(point: Point, tiles: MutableMap<Point, Int>, queue: MutableList<Point>) {
+    point.neighbours
+        .filter { it in tiles && tiles[it] == -1 }
+        .forEach {
+            tiles[it] = (tiles[point] ?: error("You cocked up!")) + 1
+            queue.add(it)
+        }
 }
 
 private val Point.neighbours get() = listOf(
@@ -63,11 +75,10 @@ private fun createMap(program: IntCode): Map<Point, Char> {
     map[start] = 'S'
 
     var point = start
-    var direction = Direction.EAST
+    var direction = CardinalDirection.EAST
     while (true) {
         val nextPoint = point.next(direction)
         if (nextPoint == start) {
-            println("DONE")
             break
         }
         when (Status.from(program.run(direction.n))) {
@@ -117,11 +128,11 @@ private fun render(map: Map<Point, Char>) {
     println()
 }
 
-private fun Point.next(dir: Direction) = when (dir) {
-    Direction.NORTH -> copy(y = y + 1)
-    Direction.SOUTH -> copy(y = y - 1)
-    Direction.WEST -> copy(x = x - 1)
-    Direction.EAST -> copy(x = x + 1)
+private fun Point.next(dir: CardinalDirection) = when (dir) {
+    CardinalDirection.NORTH -> copy(y = y + 1)
+    CardinalDirection.SOUTH -> copy(y = y - 1)
+    CardinalDirection.WEST -> copy(x = x - 1)
+    CardinalDirection.EAST -> copy(x = x + 1)
 }
 
 private enum class Status(val n: Long) {
