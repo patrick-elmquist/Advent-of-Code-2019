@@ -1,8 +1,3 @@
-import javafx.scene.Parent
-import javafx.scene.paint.Color
-import tornadofx.View
-import tornadofx.hbox
-import tornadofx.rectangle
 import util.Day
 import kotlin.math.ceil
 
@@ -15,15 +10,12 @@ fun main() {
         answer {
             val ore = 1000000000000L
             val reactionTree = parseReactionTree(lines)
-            val costForOne = calculateOres(reactionTree, mutableMapOf(), "FUEL", 1L)
+            val storage = mutableMapOf<String, Long>()
 
-            var fuel = ore / costForOne
-            while(true) {
-                val cost = calculateOres(reactionTree, mutableMapOf(), "FUEL", fuel)
-                if (cost >= ore) {
-                    println("breaking: fuel:$fuel cost:$cost")
-                    break
-                }
+            var fuel = 0L
+            var remaining = ore
+            while(remaining > 0) {
+                remaining -= calculateOres(reactionTree, storage, "FUEL", 1)
                 fuel++
             }
             fuel - 1
@@ -35,17 +27,23 @@ private fun calculateOres(
     tree: Map<String, Reaction>,
     storage: MutableMap<String, Long>,
     name: String,
-    wanted: Long
+    wantedAmount: Long
 ): Long {
-    val reaction = tree[name] ?: error("Could not find reaction for $name")
+    val reaction = tree[name] ?: error("Couldn't find reaction for $name")
 
-    val needToProduce = pullFromStorage(storage, name, wanted)
-    if (needToProduce == 0L) return 0L
+    val needToProduce = wantedAmount - fetchFromStorage(storage, name, wantedAmount)
+    if (needToProduce == 0L) {
+        // println("No need to produce")
+        return 0L
+    }
 
     val repeats = ceil(needToProduce.toFloat() / reaction.smallestAmount.toFloat()).toLong()
     val producedAmount = repeats * reaction.smallestAmount
 
-    storage.merge(name, producedAmount - needToProduce, Long::plus)
+    val leftOvers = producedAmount - needToProduce
+    if (leftOvers > 0) {
+        storage.merge(name, leftOvers, Long::plus)
+    }
 
     return reaction.inputs.map { (name, amount) ->
         if (name == "ORE") {
@@ -56,10 +54,20 @@ private fun calculateOres(
     }.sum()
 }
 
-private fun pullFromStorage(storage: MutableMap<String, Long>, name: String, amount: Long): Long {
-    val spare = storage.getOrDefault(name, 0L)
-    storage[name] = (spare - amount).coerceAtLeast(0L)
-    return (amount - spare).coerceAtLeast(0L)
+private fun fetchFromStorage(storage: MutableMap<String, Long>, name: String, amount: Long): Long {
+    val spare = storage[name]
+    return when {
+        spare == null -> 0
+        spare <= amount -> {
+            storage.remove(name)
+            spare
+        }
+        spare > amount -> {
+            storage[name] = spare - amount
+            amount
+        }
+        else -> error("What did you do? name:$name spare:$spare amount:$amount")
+    }
 }
 
 private data class Reaction(val name: String, val smallestAmount: Long, val inputs: Map<String, Long>)
@@ -91,7 +99,7 @@ val test2 = (
         "2 AB, 3 BC, 4 CA => 1 FUEL").split("\n")
 
 val test3 = (
-        "157 ORE => 5 NZVS\n" +
+"157 ORE => 5 NZVS\n" +
         "165 ORE => 6 DCFZ\n" +
         "44 XJWVT, 5 KHKGT, 1 QDVJ, 29 NZVS, 9 GPVTF, 48 HKGWZ => 1 FUEL\n" +
         "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ\n" +

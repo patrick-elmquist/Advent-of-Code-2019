@@ -2,6 +2,7 @@
 
 *.iml
 lib/
+build/
 
 ## Directory-based project format:
 .idea/
