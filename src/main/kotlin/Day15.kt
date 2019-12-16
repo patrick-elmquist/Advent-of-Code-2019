@@ -1,4 +1,3 @@
-import Status.*
 import extension.asLongs
 import extension.csv
 import util.Day
@@ -60,13 +59,6 @@ private fun visitAndQueueNeighbours(point: Point, tiles: MutableMap<Point, Int>,
         }
 }
 
-private val Point.neighbours get() = listOf(
-    copy(x = x - 1),
-    copy(x = x + 1),
-    copy(y = y - 1),
-    copy(y = y + 1)
-)
-
 private fun createMap(program: IntCode): Map<Point, Char> {
     val start = Point(0, 0)
     var oxygen: Point? = null
@@ -77,35 +69,34 @@ private fun createMap(program: IntCode): Map<Point, Char> {
     var point = start
     var direction = CardinalDirection.EAST
     while (true) {
-        val nextPoint = point.next(direction)
-        if (nextPoint == start) {
-            break
-        }
-        when (Status.from(program.run(direction.n))) {
-            WALL -> {
-                map[nextPoint] = '#'
+        val nextPoint = point.next(direction).takeIf { it != start } ?: break
+
+        map[nextPoint] = when (val status = program.run(direction.n)) {
+            0L -> {
                 direction = direction.ccw()
+                '#'
             }
 
-            OK -> {
+            1L -> {
                 if (point != oxygen && point != start) {
                     map[point] = '.'
                 }
-                map[nextPoint] = 'D'
                 point = nextPoint
                 direction = direction.cw()
+                'D'
             }
 
-            FOUND -> {
+            2L -> {
                 map[point] = '.'
-                map[nextPoint] = 'O'
                 oxygen = nextPoint
                 point = nextPoint
                 direction = direction.cw()
+                'O'
             }
+
+            else -> error("Not sure what to do with: $status")
         }
     }
-    map[start] = 'S'
     return map
 }
 
@@ -128,16 +119,16 @@ private fun render(map: Map<Point, Char>) {
     println()
 }
 
+private val Point.neighbours get() = listOf(
+    copy(x = x - 1),
+    copy(x = x + 1),
+    copy(y = y - 1),
+    copy(y = y + 1)
+)
+
 private fun Point.next(dir: CardinalDirection) = when (dir) {
     CardinalDirection.NORTH -> copy(y = y + 1)
     CardinalDirection.SOUTH -> copy(y = y - 1)
     CardinalDirection.WEST -> copy(x = x - 1)
     CardinalDirection.EAST -> copy(x = x + 1)
-}
-
-private enum class Status(val n: Long) {
-    WALL(0), OK(1), FOUND(2);
-    companion object {
-        fun from(n: Long) = values().find { it.n == n } ?: error("What did you do? $n")
-    }
 }
