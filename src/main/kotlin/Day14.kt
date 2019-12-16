@@ -1,3 +1,8 @@
+import javafx.scene.Parent
+import javafx.scene.paint.Color
+import tornadofx.View
+import tornadofx.hbox
+import tornadofx.rectangle
 import util.Day
 import kotlin.math.ceil
 

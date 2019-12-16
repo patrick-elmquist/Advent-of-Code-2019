@@ -30,3 +30,7 @@ out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+
+# Gradle
+.gradle
+/local.properties
