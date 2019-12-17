@@ -5,11 +5,9 @@ import kotlin.math.ceil
 // Answer #1: 74369033
 // Answer #2: 19903864
 
-private val basePattern = listOf(0, 1, 0, -1)
-
 fun main() {
     Day(n = 16) {
-        answer { fftSequence(lines.first(), basePattern).take(100).last().take(8) }
+        answer { fftSequence(lines.first(), listOf(0, 1, 0, -1)).take(100).last().take(8) }
         answer {
             val input = lines.first()
             val tail = input.length * 10000 - input.take(7).toInt()
