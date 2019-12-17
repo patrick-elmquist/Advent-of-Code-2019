@@ -14,9 +14,11 @@ fun main() {
         answer("00000000000012345678") {
             generateFftSequence(lines.first(), basePattern).take(1).last().take(8)
         }
-        answer("03081770884921959731165446850517") {
-            println(answer2(lines.first()).take(8))
+        answer {
+            println(answer2(lines.first()).reversed().take(8))
             //answer2(lines.first(), basePattern)
+
+            // 26048260 too high
         }
     }
 }
@@ -27,27 +29,29 @@ private fun answer2(input: String): String {
     val range = (inputSize - 1) downTo (skip + 1)
     println("size:$inputSize skip:$skip range:$range")
     val len = inputSize - skip
-    var put = (0 until 10000).map { input }.joinToString("").takeLast(len)
+    var put = (0 until 10000).map { input }.joinToString("").takeLast(len).reversed()
     for (i in 0 until 100) {
+        println("iteration:$i")
         val seq = someSequence(put).last()
-        put = seq.second.second.toString().reversed()
+        put = seq.sb.toString()
     }
     return put
 }
 
+class Output(var index: Int, var sum: Int = 0, val sb: StringBuilder = StringBuilder())
 private fun someSequence(input: String) =
-    generateSequence(input to (0 to StringBuilder())) { (input, output) ->
-        val sum = output.first
-        val out = output.second
-        if (input.isEmpty()) {
+    generateSequence(Output(index = 0)) { output ->
+        if (output.index == input.length) {
             return@generateSequence null
         }
 
-        val char = Character.getNumericValue(input.last())
-        val newInput = input.dropLast(1)
-        val newSum = ((sum + char) % 10) // .also { println("in:$char out:$it") }
-        out.append(newSum)
-        newInput to (newSum to out)
+        val char = Character.getNumericValue(input[output.index])
+        output.index = output.index + 1
+        output.sum = ((output.sum + char) % 10)
+        output.sb.append(output.sum)
+
+        output
+
     }
 
 private fun generateFftSequence(input: String, base: List<Int>) =
