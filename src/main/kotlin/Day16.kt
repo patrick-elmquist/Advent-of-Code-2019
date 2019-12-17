@@ -1,57 +1,31 @@
 import util.Day
-import java.lang.StringBuilder
 import kotlin.math.abs
 import kotlin.math.ceil
 
 // Answer #1: 74369033
-// Answer #2:
+// Answer #2: 19903864
 
 private val basePattern = listOf(0, 1, 0, -1)
 
 fun main() {
     Day(n = 16) {
-
-        answer("00000000000012345678") {
-            generateFftSequence(lines.first(), basePattern).take(1).last().take(8)
-        }
-        answer {
-            println(answer2(lines.first()).reversed().take(8))
-            //answer2(lines.first(), basePattern)
-
-            // 26048260 too high
-        }
+        answer { generateFftSequence(lines.first(), basePattern).take(100).last().take(8) }
+        answer { answer2(lines.first()).take(8).joinToString("") }
     }
 }
 
-private fun answer2(input: String): String {
-    val inputSize = input.length * 10000
-    val skip = input.take(7).toInt()
-    val range = (inputSize - 1) downTo (skip + 1)
-    println("size:$inputSize skip:$skip range:$range")
-    val len = inputSize - skip
-    var put = (0 until 10000).map { input }.joinToString("").takeLast(len).reversed()
-    for (i in 0 until 100) {
-        println("iteration:$i")
-        val seq = someSequence(put).last()
-        put = seq.sb.toString()
-    }
-    return put
+private fun answer2(input: String): List<Int> {
+    val len = input.length * 10000 - input.take(7).toInt()
+    val start = (0 until 10000).joinToString("") { input }.takeLast(len).map { Character.getNumericValue(it) }.reversed()
+    return (0 until 100)
+        .fold(start) { out, _ -> someSequence(out).last() }
+        .reversed()
 }
 
-class Output(var index: Int, var sum: Int = 0, val sb: StringBuilder = StringBuilder())
-private fun someSequence(input: String) =
-    generateSequence(Output(index = 0)) { output ->
-        if (output.index == input.length) {
-            return@generateSequence null
-        }
-
-        val char = Character.getNumericValue(input[output.index])
-        output.index = output.index + 1
-        output.sum = ((output.sum + char) % 10)
-        output.sb.append(output.sum)
-
-        output
-
+private fun someSequence(input: List<Int>) =
+    generateSequence(mutableListOf<Int>()) { output ->
+        if (output.size == input.size) return@generateSequence null
+        else output.apply { add(((output.getOrNull(output.size - 1) ?: 0) + input[output.size]) % 10) }
     }
 
 private fun generateFftSequence(input: String, base: List<Int>) =
@@ -76,12 +50,4 @@ private fun generatePattern(base: List<Int>, n: Int, len: Int): List<Int> {
     val pattern = base.flatMap { digit -> (0..n).map { digit } }
     return (0 until repeats).flatMap { pattern }
         .drop(1)
-        .onEach {
-            if (it < 0) {
-                // print(" " + it)
-            } else {
-                // print("  " + it)
-            }
-        }
-        // .println()
 }
