@@ -7,6 +7,7 @@ fun <T: Collection<String>> T.asLongs() = map { it.toLong() }
 fun <T: Collection<String>> T.asFloats() = map { it.toFloat() }
 
 fun <E,T : Collection<E>> T.print(): T = onEach { println(it) }
+fun <E,T : Collection<E>> T.println(): T = apply { kotlin.io.println() }
 
 fun IntRange.permutations() = toList().permutations()
 fun <T> List<T>.permutations(): Set<List<T>> = when {
