@@ -48,11 +48,4 @@ private fun Point.scaffoldNeighbourCount(pointToCharMap: Map<Point, Char>) =
         .map { pointToCharMap[it] }
         .sumBy { if (it in scaffold) 1 else 0 }
 
-private val Point.neighbours get() = listOf(
-    copy(x = x - 1),
-    copy(x = x + 1),
-    copy(y = y - 1),
-    copy(y = y + 1)
-)
-
 private fun String.toLongInput() = map { it.toLong() }.toLongArray()

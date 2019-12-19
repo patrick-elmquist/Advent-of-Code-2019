@@ -7,6 +7,14 @@ import kotlin.math.atan2
 import kotlin.math.roundToInt
 
 data class Point(val x: Int = 0, val y: Int = 0) {
+    val neighbours by lazy {
+        listOf(
+            copy(x = x - 1),
+            copy(x = x + 1),
+            copy(y = y - 1),
+            copy(y = y + 1)
+        )
+    }
     fun toPointF() = PointF(x.f, y.f)
 }
 

@@ -119,13 +119,6 @@ private fun render(map: Map<Point, Char>) {
     println()
 }
 
-private val Point.neighbours get() = listOf(
-    copy(x = x - 1),
-    copy(x = x + 1),
-    copy(y = y - 1),
-    copy(y = y + 1)
-)
-
 private fun Point.next(dir: CardinalDirection) = when (dir) {
     CardinalDirection.NORTH -> copy(y = y + 1)
     CardinalDirection.SOUTH -> copy(y = y - 1)
