@@ -15,6 +15,10 @@ data class Point(val x: Int = 0, val y: Int = 0) {
             copy(y = y + 1)
         )
     }
+
+    constructor(x: Long, y: Long): this(x.toInt(), y.toInt())
+    constructor(xy: Pair<Int, Int>): this(xy.first, xy.second)
+
     fun toPointF() = PointF(x.f, y.f)
 }
 
