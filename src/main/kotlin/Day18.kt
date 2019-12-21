@@ -1,5 +1,8 @@
 import util.Day
+import util.Matrix
 import util.Point
+import util.render
+import util.toMatrix
 
 // Answer #1: 5964
 // Answer #2: 1996
@@ -11,7 +14,7 @@ private val keysAndDoorsSet = keySet + ('A'..'Z')
 fun main() {
     Day(n = 18) {
         answer {
-            val routeInfo = findRouteInfo(parseMatrix(lines))
+            val routeInfo = findRouteInfo(lines.toMatrix(default = '-'))
             val keys = routeInfo.filterKeys { it in keySet }.keys
 
             var info = mutableMapOf(('@' to emptySet<Char>()) to 0)
@@ -40,7 +43,7 @@ fun main() {
         }
 
         answer {
-            val matrix = parseMatrix(lines).also { applyVaults(it) }
+            val matrix = lines.toMatrix(default = '-').also { applyVaults(it) }
             matrix.render()
             val routeInfo = findRouteInfo(matrix)
             val keys = routeInfo.filterKeys { it in keySet }.keys
@@ -124,15 +127,5 @@ private fun distance(from: Point, matrix: Matrix<Char>) =
         }
     }
 
-private fun parseMatrix(input: List<String>) =
-    Array(input.size) { Array(input.first().length) { '-' } }.also { matrix ->
-        input.forEachIndexed { x, row -> row.forEachIndexed { y, c -> matrix[x][y] = c } }
-    }
-
 class Poi(val location: Point, val distance: Int, val route: String)
 
-typealias Matrix<T> = Array<Array<T>>
-private fun <T> Matrix<T>.render() {
-    println(joinToString("\n") { it.joinToString("") })
-    println()
-}
