@@ -1,42 +1,43 @@
 import util.Day
-import java.lang.Math.abs
+import java.lang.IllegalArgumentException
+import kotlin.math.absoluteValue
 
-// Answer #1:
+// Answer #1: 7665
 // Answer #2:
 
 fun main() {
     Day(n = 22) {
         answer {
-            var cards = (0..10006).toList()
-            lines.forEach {
-                when {
-                    "increment" in it -> {
-                        val number = it.split(" ").last().toInt()
-                        var index = 0
-                        val array = IntArray(cards.size)
-                        cards.forEach {
-                            array[index] = it
-                            index += number
-                            index %= (cards.size)
-                        }
-                        cards = array.toList()
-                    }
-                    "stack" in it -> cards = cards.reversed()
-                    "cut" in it -> {
-                        val number = it.split(" ").last().toInt()
-                        if (number < 0) {
-                            cards = cards.subList(cards.size - abs(number), cards.size) + cards.subList(0, cards.size - abs(number))
-                        } else {
-                            cards = cards.subList(number, cards.size) + cards.subList(0, number)
-                        }
-                    }
-                }
-            }
-            println(cards.indexOf(2019))
-            ""
+            shuffleCardsNaive(10007, lines).indexOf(2019)
         }
         answer {
+
         }
     }
 }
+
+private fun shuffleCardsNaive(cardsInDeck: Int, instructions: List<String>): List<Int> {
+    return instructions.fold((0 until cardsInDeck).toList()) { deck, instruction ->
+        when {
+            "cut" in instruction -> deck.cut(instruction.getNumber())
+            "increment" in instruction -> deck.deal(instruction.getNumber())
+            "stack" in instruction -> deck.reversed()
+            else -> throw IllegalStateException("Should never happen...")
+        }
+    }
+}
+
+private fun List<Int>.cut(n: Int): List<Int> = when {
+    n > 0 -> drop(n) + take(n)
+    n < 0 -> takeLast(n.absoluteValue) + dropLast(n.absoluteValue)
+    else -> this
+}
+
+private fun List<Int>.deal(increment: Int): List<Int> {
+    return fold(toMutableList() to 0) { (deck, i), card ->
+        deck.apply { set(i, card) } to ((i + increment) % size)
+    }.first
+}
+
+private fun String.getNumber() = this.split(" ").last().toInt()
 
